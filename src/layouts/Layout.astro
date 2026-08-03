@@ -193,8 +193,15 @@ const {
         reservados.
       </div>
       <div class="made-with-love">
-        Hecho con <span class="heart-icon" set:html={heartIcon} /> por <strong
-          >MateCode</strong
+        {/*
+          The studio name was plain text until now, which meant the credit
+          pointed nowhere. A followable link is the whole value of a credit —
+          no `nofollow`.
+        */}
+        Hecho con <span class="heart-icon" set:html={heartIcon} /> por <a
+          href="https://matecode.dev"
+          target="_blank"
+          rel="noopener">MateCode</a
         >
       </div>
     </footer>
@@ -494,9 +501,18 @@ const {
     color: rgba(255, 255, 255, 0.8);
   }
 
-  .made-with-love strong {
+  /* Was `strong` until the studio name became a link. Same weight and colour
+     as before so the footer reads exactly as it did. */
+  .made-with-love a {
     color: var(--color-primary);
     font-weight: 600;
+    text-decoration: none;
+  }
+
+  .made-with-love a:hover,
+  .made-with-love a:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
   .heart-icon {
