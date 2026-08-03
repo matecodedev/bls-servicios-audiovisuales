@@ -3,7 +3,12 @@ import { defineConfig } from "astro/config";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://serviciosbls.com",
+  // The live site. `serviciosbls.com` was a staging domain that outlived its
+  // purpose: it is a separate hosting account still serving a full copy, and
+  // leaving it here made the generated sitemap and robots.txt advertise it as
+  // canonical while every page declared blsnet.com.ar. Search engines were
+  // being told two different things about the same content.
+  site: "https://blsnet.com.ar",
   devToolbar: {
     enabled: false,
   },

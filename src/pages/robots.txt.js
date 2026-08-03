@@ -7,7 +7,7 @@ export const prerender = true;
 
 /** @returns {string} */
 function normalizeSite() {
-  const raw = import.meta.env.SITE || "https://serviciosbls.com";
+  const raw = import.meta.env.SITE || "https://blsnet.com.ar";
   return String(raw).replace(/\/+$/, "");
 }
 
