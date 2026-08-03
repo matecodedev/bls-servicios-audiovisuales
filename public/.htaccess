@@ -1,0 +1,22 @@
+# Canonical host: blsnet.com.ar
+#
+# The site answers on three hostnames — blsnet.com.ar, www.blsnet.com.ar and
+# serviciosbls.com — and until now every one of them returned 200 with
+# identical content. A search engine reads that as three copies of the same
+# site competing with each other, which is why none of them consolidates. The
+# pages already declare https://blsnet.com.ar/ as their canonical, so that is
+# the host everything folds into.
+
+RewriteEngine On
+
+# Any hostname that is not the apex redirects to it, keeping the path and the
+# query string. This runs before the HTTPS rule on purpose: sending
+# http://www/... straight to https://apex/... costs one hop instead of two.
+RewriteCond %{HTTP_HOST} !^blsnet\.com\.ar$ [NC]
+RewriteRule ^ https://blsnet.com.ar%{REQUEST_URI} [R=301,L]
+
+# Plain HTTP on the apex upgrades to HTTPS. The hosting panel already does
+# this, but stating it here keeps the behaviour with the site instead of with
+# a setting nobody can see from the repository.
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://blsnet.com.ar%{REQUEST_URI} [R=301,L]
