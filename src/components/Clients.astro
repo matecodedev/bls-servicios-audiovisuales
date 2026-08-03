@@ -85,26 +85,30 @@ const clients = [
 
 // Cifras y estadísticas
 const stats = [
-  { value: "6700+", label: "Eventos Realizados" },
-  { value: "225+", label: "Clientes Recurrentes" },
-  { value: "98%", label: "Índice de Satisfacción" },
-  { value: "27", label: "Años de Experiencia" },
+  { value: "6700+", label: "Eventos Realizados", target: 6700, suffix: "+" },
+  { value: "225+", label: "Clientes Recurrentes", target: 225, suffix: "+" },
+  { value: "98%", label: "Índice de Satisfacción", target: 98, suffix: "%" },
+  { value: "27", label: "Años de Experiencia", target: 27, suffix: "" },
 ];
 ---
 
 <section id="clientes" class="clients">
   <div class="container">
-    <div class="section-title">
+    <div class="section-title reveal">
       <h2>Nuestros Clientes</h2>
       <p>Empresas y organizaciones que han confiado en nuestros servicios</p>
     </div>
 
     <!-- Stats section -->
-    <div class="stats-container">
+    <div class="stats-container reveal">
       {
-        stats.map((stat) => (
-          <div class="stat-item">
-            <div class="stat-value">{stat.value}</div>
+        stats.map((stat, index) => (
+          <div class={`stat-item reveal-scale reveal-delay-${index + 1}`}>
+            <div 
+              class="stat-value" 
+              data-target={stat.target} 
+              data-suffix={stat.suffix}
+            >0{stat.suffix}</div>
             <div class="stat-label">{stat.label}</div>
           </div>
         ))
@@ -160,7 +164,7 @@ const stats = [
     background-color: white;
     padding: 2rem;
     border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-lg);
   }
 
   .stat-item {
@@ -190,7 +194,7 @@ const stats = [
     padding: 2rem 0;
     border-radius: 12px;
     margin: 3rem 0;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
   }
 
   .carousel-track {
@@ -199,6 +203,7 @@ const stats = [
     width: calc(
       200px * 40
     ); /* Ancho de cada ítem * número total de ítems (20 clientes duplicados) */
+    transition: animation-play-state 0.3s ease;
   }
 
   @keyframes scroll {
@@ -210,8 +215,36 @@ const stats = [
     }
   }
 
-  .carousel-track:hover {
+  .clients-carousel:hover .carousel-track {
     animation-play-state: paused;
+  }
+
+  .clients-carousel:hover::before {
+    content: "⏸ Pausado";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    z-index: 10;
+    pointer-events: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
   }
 
   .carousel-item {
@@ -237,15 +270,22 @@ const stats = [
     max-height: 90%;
     object-fit: contain;
     filter: grayscale(100%);
-    opacity: 0.7;
+    opacity: 0.6;
     transition:
-      filter 0.3s,
-      opacity 0.3s;
+      filter 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.3s ease;
   }
 
   .client-logo:hover img {
-    filter: grayscale(0);
+    filter: grayscale(0%);
     opacity: 1;
+    transform: scale(1.1);
+  }
+
+  .carousel-item:hover .client-logo img {
+    filter: grayscale(50%);
+    opacity: 0.8;
   }
 
   .client-name {
@@ -262,7 +302,7 @@ const stats = [
     border-radius: 12px;
     text-align: center;
     margin-top: 3rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-lg);
   }
 
   .clients-cta h3 {
@@ -310,6 +350,45 @@ const stats = [
 </style>
 
 <script>
-  // No se necesita JavaScript adicional para este carrusel
-  // ya que funciona automáticamente con CSS animation
+  document.addEventListener('DOMContentLoaded', () => {
+    // Contadores animados
+    const statValues = document.querySelectorAll('.stat-value[data-target]');
+    
+    function animateCounter(element: HTMLElement) {
+      const target = parseInt(element.getAttribute('data-target') || '0');
+      const suffix = element.getAttribute('data-suffix') || '';
+      const duration = 2000; // 2 segundos
+      const steps = 60;
+      const increment = target / steps;
+      let current = 0;
+      const stepTime = duration / steps;
+
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          current = target;
+          clearInterval(timer);
+        }
+        element.textContent = Math.floor(current) + suffix;
+      }, stepTime);
+    }
+
+    // Observar cuando los stats entran en viewport
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const statValue = entry.target as HTMLElement;
+          if (!statValue.classList.contains('animated')) {
+            statValue.classList.add('animated');
+            animateCounter(statValue);
+            statsObserver.unobserve(statValue);
+          }
+        }
+      });
+    }, { threshold: 0.5 });
+
+    statValues.forEach(stat => {
+      statsObserver.observe(stat);
+    });
+  });
 </script>

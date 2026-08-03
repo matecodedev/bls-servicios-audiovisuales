@@ -115,6 +115,10 @@ const {
     </script>
   </head>
   <body>
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-progress" aria-hidden="true">
+      <div class="scroll-progress-bar"></div>
+    </div>
     <header>
       <nav>
         <div>
@@ -135,11 +139,11 @@ const {
         <!-- Menú de navegación -->
         <div id="navWrapper" class="nav-wrapper">
           <ul class="nav-menu">
-            <li><a href="/#sobre-nosotros">Sobre Nosotros</a></li>
-            <li><a href="/#servicios">Servicios</a></li>
-            <li><a href="/#clientes">Clientes</a></li>
-            <li><a href="/#recursos">Recursos</a></li>
-            <li><a href="/#contacto" class="contact-nav-btn">Contacto</a></li>
+            <li><a href="/#sobre-nosotros" data-section="sobre-nosotros">Sobre Nosotros</a></li>
+            <li><a href="/#servicios" data-section="servicios">Servicios</a></li>
+            <li><a href="/#clientes" data-section="clientes">Clientes</a></li>
+            <li><a href="/#recursos" data-section="recursos">Recursos</a></li>
+            <li><a href="/#contacto" class="contact-nav-btn" data-section="contacto">Contacto</a></li>
           </ul>
         </div>
       </nav>
@@ -241,7 +245,137 @@ const {
             }
           });
         }
+
+        // ============================================
+        // HEADER CON EFECTO SCROLL (SOMBRAS)
+        // ============================================
+        const header = document.querySelector('header');
+        if (header) {
+          window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+              header.classList.add('scrolled');
+            } else {
+              header.classList.remove('scrolled');
+            }
+          });
+        }
+
+        // ============================================
+        // INDICADOR DE SECCIÓN ACTIVA
+        // ============================================
+        const navLinks = document.querySelectorAll('nav a[data-section]');
+        const sections = document.querySelectorAll('section[id]');
+
+        function updateActiveSection() {
+          let current = '';
+          const scrollPosition = window.pageYOffset + 150; // Offset para header
+
+          sections.forEach((section) => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
+            const sectionId = section.getAttribute('id');
+
+            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+              current = sectionId;
+            }
+          });
+
+          navLinks.forEach((link) => {
+            link.classList.remove('active');
+            const linkSection = link.getAttribute('data-section');
+            if (linkSection === current) {
+              link.classList.add('active');
+            }
+          });
+        }
+
+        // Actualizar al hacer scroll
+        window.addEventListener('scroll', updateActiveSection);
+        // Actualizar al cargar la página
+        updateActiveSection();
+
+        // ============================================
+        // SCROLL PROGRESS INDICATOR
+        // ============================================
+        const scrollProgressBar = document.querySelector('.scroll-progress-bar');
+        if (scrollProgressBar) {
+          function updateScrollProgress() {
+            const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (window.scrollY / windowHeight) * 100;
+            scrollProgressBar.style.width = scrolled + '%';
+          }
+
+          window.addEventListener('scroll', updateScrollProgress);
+          updateScrollProgress();
+        }
       });
+
+      // ============================================
+      // ANIMACIONES DE SCROLL Y REVEAL
+      // ============================================
+      
+      // Función para observar elementos y activar animaciones
+      function initScrollAnimations() {
+        // Verificar si el usuario prefiere movimiento reducido
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+        if (prefersReducedMotion) {
+          // Si prefiere movimiento reducido, mostrar todo sin animación
+          document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
+            el.classList.add('active');
+          });
+          return;
+        }
+
+        // Esperar un poco antes de inicializar para que la página cargue completamente
+        setTimeout(() => {
+          // Configuración del Intersection Observer - más estricto para mejor visibilidad
+          const observerOptions = {
+            root: null,
+            rootMargin: '0px 0px -100px 0px', // Activar cuando el elemento está 100px antes de entrar en viewport
+            threshold: 0.2 // Activar cuando el 20% del elemento es visible (más visible)
+          };
+
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                // Agregar un pequeño delay para que la animación sea más visible
+                setTimeout(() => {
+                  entry.target.classList.add('active');
+                }, 100);
+                // Dejar de observar después de activar para mejor performance
+                observer.unobserve(entry.target);
+              }
+            });
+          }, observerOptions);
+
+          // Observar todos los elementos con clase reveal
+          const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+          
+          // Para elementos que ya están en el viewport (como el Hero), activarlos después de un delay
+          revealElements.forEach((el, index) => {
+            const rect = el.getBoundingClientRect();
+            const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+            
+            if (isInViewport && el.closest('.hero')) {
+              // Elementos del Hero: activar con delay escalonado
+              setTimeout(() => {
+                el.classList.add('active');
+              }, 300 + (index * 100));
+            } else {
+              // Otros elementos: observar con Intersection Observer
+              observer.observe(el);
+            }
+          });
+        }, 100); // Pequeño delay inicial
+      }
+
+      // Inicializar animaciones cuando el DOM esté listo
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initScrollAnimations);
+      } else {
+        initScrollAnimations();
+      }
     </script>
   </body>
 </html>
@@ -253,8 +387,35 @@ const {
     --color-accent: #e1e472;
     --color-background: #ffffff;
     --color-text: #333333;
+    --color-text-light: #666666;
     --color-light: #f8f9fa;
     --color-dark: #212529;
+
+    /* ============================================
+       SISTEMA DE ESPACIADO MEJORADO
+       ============================================ */
+    --spacing-xs: 0.5rem;    /* 8px */
+    --spacing-sm: 1rem;      /* 16px */
+    --spacing-md: 1.5rem;    /* 24px */
+    --spacing-lg: 2.5rem;    /* 40px */
+    --spacing-xl: 4rem;       /* 64px */
+    --spacing-xxl: 6rem;      /* 96px */
+    --spacing-xxxl: 8rem;     /* 128px */
+
+    /* ============================================
+       SISTEMA DE SOMBRAS MEJORADO
+       ============================================ */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.15), 0 6px 12px rgba(0, 0, 0, 0.12);
+    --shadow-2xl: 0 20px 40px rgba(0, 0, 0, 0.18), 0 10px 20px rgba(0, 0, 0, 0.15);
+
+    /* Sombras con color primario para efectos especiales */
+    --shadow-primary-sm: 0 2px 8px rgba(179, 187, 9, 0.2);
+    --shadow-primary-md: 0 4px 12px rgba(179, 187, 9, 0.25);
+    --shadow-primary-lg: 0 8px 24px rgba(179, 187, 9, 0.3);
   }
 
   * {
@@ -278,7 +439,21 @@ const {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 var(--spacing-md);
+  }
+
+  /* Contenedores más amplios en pantallas grandes */
+  @media (min-width: 1400px) {
+    .container {
+      max-width: 1400px;
+      padding: 0 var(--spacing-lg);
+    }
+  }
+
+  @media (min-width: 1600px) {
+    .container {
+      max-width: 1600px;
+    }
   }
 
   h1,
@@ -293,7 +468,40 @@ const {
   }
 
   section {
-    padding: 5rem 0;
+    padding: var(--spacing-xxl) 0;
+  }
+
+  /* Más respiración en pantallas grandes */
+  @media (min-width: 992px) {
+    section {
+      padding: var(--spacing-xxxl) 0;
+    }
+  }
+
+  /* Espaciado reducido en móviles */
+  @media (max-width: 768px) {
+    section {
+      padding: var(--spacing-xl) 0;
+    }
+  }
+
+  /* Scroll Progress Indicator */
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: rgba(0, 0, 0, 0.05);
+    z-index: 1001;
+  }
+
+  .scroll-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--color-primary);
+    transition: width 0.1s ease-out;
+    box-shadow: 0 0 10px rgba(179, 187, 9, 0.5);
   }
 
   header {
@@ -302,8 +510,17 @@ const {
     left: 0;
     width: 100%;
     background-color: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-md);
     z-index: 1000;
+    transition: box-shadow 0.3s ease;
+  }
+
+  /* Header con scroll - sombra más pronunciada */
+  header.scrolled {
+    box-shadow: var(--shadow-lg);
+    background-color: rgba(255, 255, 255, 0.98);
   }
 
   nav {
@@ -332,10 +549,33 @@ const {
     color: var(--color-text);
     font-weight: 500;
     transition: color 0.3s;
+    position: relative;
+    padding: 0.25rem 0;
+  }
+
+  nav a::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-primary);
+    transition: width 0.3s ease;
+  }
+
+  nav a:hover::after,
+  nav a.active::after {
+    width: 100%;
   }
 
   nav a:hover {
     color: var(--color-primary);
+  }
+
+  nav a.active {
+    color: var(--color-primary);
+    font-weight: 600;
   }
 
   .contact-nav-btn {
@@ -681,6 +921,101 @@ const {
 
     .contact-nav-btn:hover {
       transform: scale(1.05);
+    }
+  }
+
+  /* ============================================
+     ANIMACIONES DE SCROLL Y REVEAL
+     ============================================ */
+  
+  /* Clase base para elementos que se animarán */
+  .reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+  }
+
+  /* Estado activo cuando el elemento es visible */
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Variaciones de delay para animación escalonada */
+  .reveal-delay-1 {
+    transition-delay: 0.1s;
+  }
+
+  .reveal-delay-2 {
+    transition-delay: 0.2s;
+  }
+
+  .reveal-delay-3 {
+    transition-delay: 0.3s;
+  }
+
+  .reveal-delay-4 {
+    transition-delay: 0.4s;
+  }
+
+  /* Animación desde la izquierda */
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+  }
+
+  .reveal-left.active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Animación desde la derecha */
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+  }
+
+  .reveal-right.active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Animación de escala */
+  .reveal-scale {
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+  }
+
+  .reveal-scale.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Smooth scroll mejorado con offset para header fijo */
+  html {
+    scroll-padding-top: 80px;
+  }
+
+  /* Optimización: reducir animaciones en dispositivos con preferencia de movimiento reducido */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal,
+    .reveal-left,
+    .reveal-right,
+    .reveal-scale {
+      opacity: 1;
+      transform: none;
+      transition: none;
     }
   }
 </style>

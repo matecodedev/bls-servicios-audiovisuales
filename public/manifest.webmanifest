@@ -1,0 +1,17 @@
+{
+  "name": "BLS Servicios Audiovisuales",
+  "short_name": "BLS",
+  "description": "Servicios técnicos profesionales para eventos: sonido, iluminación, video y escenarios",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#b3bb09",
+  "icons": [
+    {
+      "src": "/logo-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
+

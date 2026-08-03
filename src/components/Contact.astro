@@ -14,7 +14,7 @@ const tiposEvento = [
 
 <section id="contacto" class="contact">
   <div class="container">
-    <div class="section-title">
+    <div class="section-title reveal">
       <h2>Contacto</h2>
       <p>
         ¿Estás organizando un evento? ¡Contáctanos para hacer realidad tu
@@ -23,7 +23,7 @@ const tiposEvento = [
     </div>
 
     <div class="contact-container">
-      <div class="contact-info">
+      <div class="contact-info reveal-left">
         <div class="info-item">
           <h3>Información de Contacto</h3>
           <p><strong>Email:</strong> info@blsnet.com.ar</p>
@@ -50,7 +50,7 @@ const tiposEvento = [
         </div>
       </div>
 
-      <div class="contact-form-container">
+      <div class="contact-form-container reveal-right">
         <h3>Envíanos un mensaje</h3>
         <form class="contact-form" id="contactForm" method="POST">
           <!-- No necesitamos campos ocultos para Formspree -->
@@ -64,17 +64,32 @@ const tiposEvento = [
               required
               minlength="2"
               maxlength="100"
+              placeholder="Tu nombre completo"
             />
+            <span class="error-message"></span>
           </div>
 
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" required />
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              required
+              placeholder="tu@email.com"
+            />
+            <span class="error-message"></span>
           </div>
 
           <div class="form-group">
             <label for="phone">Teléfono</label>
-            <input type="tel" id="phone" name="phone" placeholder="Opcional" />
+            <input 
+              type="tel" 
+              id="phone" 
+              name="phone" 
+              placeholder="+54 11 1234-5678 (Opcional)" 
+            />
+            <span class="error-message"></span>
           </div>
 
           <div class="form-group">
@@ -89,6 +104,7 @@ const tiposEvento = [
                 ))
               }
             </select>
+            <span class="error-message"></span>
           </div>
 
           <div class="form-group full-width">
@@ -101,6 +117,8 @@ const tiposEvento = [
               minlength="10"
               maxlength="1000"
               placeholder="Cuéntanos sobre tu evento..."></textarea>
+            <span class="error-message"></span>
+            <span class="char-count"><span id="charCount">0</span>/1000</span>
           </div>
 
           <div class="form-group full-width">
@@ -139,7 +157,13 @@ const tiposEvento = [
     background-color: var(--color-light);
     padding: 2rem;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .info-item:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
   }
 
   .info-item h3 {
@@ -205,7 +229,12 @@ const tiposEvento = [
     background-color: var(--color-light);
     padding: 2rem;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .contact-form-container:hover {
+    box-shadow: var(--shadow-lg);
   }
 
   .contact-form-container h3 {
@@ -238,16 +267,85 @@ const tiposEvento = [
   select,
   textarea {
     padding: 0.8rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
     font-family: inherit;
     font-size: 1rem;
     width: 100%;
     box-sizing: border-box;
+    transition: all 0.3s ease;
+    background-color: white;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(179, 187, 9, 0.1);
+    transform: translateY(-1px);
+  }
+
+  input:valid:not(:placeholder-shown),
+  select:valid,
+  textarea:valid:not(:placeholder-shown) {
+    border-color: #4caf50;
+  }
+
+  input:invalid:not(:placeholder-shown):not(:focus),
+  select:invalid:not([value=""]):not(:focus),
+  textarea:invalid:not(:placeholder-shown):not(:focus) {
+    border-color: #f44336;
+  }
+
+  input.error,
+  select.error,
+  textarea.error {
+    border-color: #f44336;
+    background-color: #ffebee;
+  }
+
+  input.success,
+  select.success,
+  textarea.success {
+    border-color: #4caf50;
+    background-color: #e8f5e9;
   }
 
   textarea {
     resize: vertical;
+  }
+
+  /* Mensajes de error */
+  .error-message {
+    color: #f44336;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    min-height: 1.25rem;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+  }
+
+  .error-message.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Contador de caracteres */
+  .char-count {
+    text-align: right;
+    font-size: 0.75rem;
+    color: var(--color-text-light);
+    margin-top: 0.25rem;
+  }
+
+  .char-count.warning {
+    color: #ff9800;
+  }
+
+  .char-count.error {
+    color: #f44336;
   }
 
   button.full-width {
@@ -377,6 +475,104 @@ const tiposEvento = [
     const contactForm = document.querySelector(".contact-form");
 
     if (contactForm instanceof HTMLFormElement) {
+      // ============================================
+      // VALIDACIÓN EN TIEMPO REAL
+      // ============================================
+      const inputs = contactForm.querySelectorAll('input, select, textarea');
+      
+      inputs.forEach((input) => {
+        // Validar al perder el foco
+        input.addEventListener('blur', () => validateField(input));
+        
+        // Validar mientras se escribe (para algunos campos)
+        if (input.type === 'email' || input.id === 'name' || input.id === 'message') {
+          input.addEventListener('input', () => {
+            if (input.value.length > 0) {
+              validateField(input);
+            }
+          });
+        }
+
+        // Limpiar errores al empezar a escribir
+        input.addEventListener('input', () => {
+          if (input.classList.contains('error')) {
+            clearFieldError(input);
+          }
+        });
+      });
+
+      // Contador de caracteres para textarea
+      const messageTextarea = contactForm.querySelector('#message');
+      const charCount = contactForm.querySelector('#charCount');
+      
+      if (messageTextarea && charCount) {
+        messageTextarea.addEventListener('input', () => {
+          const length = messageTextarea.value.length;
+          charCount.textContent = length;
+          
+          const charCountElement = charCount.closest('.char-count');
+          if (charCountElement) {
+            if (length > 900) {
+              charCountElement.classList.add('error');
+              charCountElement.classList.remove('warning');
+            } else if (length > 800) {
+              charCountElement.classList.add('warning');
+              charCountElement.classList.remove('error');
+            } else {
+              charCountElement.classList.remove('warning', 'error');
+            }
+          }
+        });
+      }
+
+      // Funciones de validación
+      function validateField(field: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) {
+        const errorMessage = field.parentElement?.querySelector('.error-message');
+        
+        if (!field.validity.valid) {
+          field.classList.add('error');
+          field.classList.remove('success');
+          
+          if (errorMessage) {
+            let message = '';
+            
+            if (field.validity.valueMissing) {
+              message = 'Este campo es requerido';
+            } else if (field.validity.typeMismatch && field.type === 'email') {
+              message = 'Por favor ingresa un email válido';
+            } else if (field.validity.tooShort) {
+              message = `Mínimo ${field.getAttribute('minlength')} caracteres`;
+            } else if (field.validity.tooLong) {
+              message = `Máximo ${field.getAttribute('maxlength')} caracteres`;
+            } else {
+              message = 'Por favor corrige este campo';
+            }
+            
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+          }
+          return false;
+        } else {
+          field.classList.remove('error');
+          field.classList.add('success');
+          
+          if (errorMessage) {
+            errorMessage.classList.remove('show');
+            errorMessage.textContent = '';
+          }
+          return true;
+        }
+      }
+
+      function clearFieldError(field: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) {
+        field.classList.remove('error');
+        const errorMessage = field.parentElement?.querySelector('.error-message');
+        if (errorMessage) {
+          errorMessage.classList.remove('show');
+          errorMessage.textContent = '';
+        }
+      }
+
       const submitButton = contactForm.querySelector('button[type="submit"]');
 
       if (submitButton instanceof HTMLButtonElement) {

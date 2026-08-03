@@ -13,7 +13,7 @@ const featuredResources = educationalResources.filter(
 
 <section id="recursos" class="resources">
   <div class="container">
-    <div class="section-title">
+    <div class="section-title reveal">
       <h2>Recursos Educativos</h2>
       <p>
         Aprende sobre tecnología y producción de eventos con nuestros artículos
@@ -22,7 +22,7 @@ const featuredResources = educationalResources.filter(
     </div>
 
     <!-- Filtro por categorías -->
-    <div class="resource-filter">
+    <div class="resource-filter reveal">
       <h3>Explora por categoría</h3>
       <div class="category-buttons">
         <button class="category-btn active" data-category="all">Todos</button>
@@ -40,8 +40,11 @@ const featuredResources = educationalResources.filter(
     <!-- Grid de recursos -->
     <div class="resources-grid">
       {
-        educationalResources.map((resource) => (
-          <div class="resource-card" data-category={resource.category}>
+        educationalResources.map((resource, index) => (
+          <div
+            class={`resource-card reveal reveal-delay-${(index % 4) + 1}`}
+            data-category={resource.category}
+          >
             <div class="resource-image">
               <img
                 src={resource.imageUrl}
@@ -150,17 +153,17 @@ const featuredResources = educationalResources.filter(
     background-color: white;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
     transition:
-      transform 0.3s,
-      box-shadow 0.3s;
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
   }
 
   .resource-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
   }
 
   .resource-image {
@@ -291,7 +294,7 @@ const featuredResources = educationalResources.filter(
     padding: 3rem;
     border-radius: 12px;
     text-align: center;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-lg);
   }
 
   .resources-cta h3 {

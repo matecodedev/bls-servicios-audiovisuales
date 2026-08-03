@@ -180,15 +180,15 @@ const services = [
 
 <section id="servicios" class="services">
   <div class="container">
-    <div class="section-title">
+    <div class="section-title reveal">
       <h2>Nuestros Servicios</h2>
       <p>Ofrecemos soluciones técnicas completas para todo tipo de eventos</p>
     </div>
 
     <div class="services-grid">
       {
-        services.map((service) => (
-          <div class="service-card">
+        services.map((service, index) => (
+          <div class={`service-card reveal reveal-delay-${(index % 4) + 1}`}>
             <div class="service-icon">{service.icon}</div>
             <h3>{service.title}</h3>
             <p>{service.description}</p>
@@ -321,11 +321,11 @@ const services = [
   .service-card {
     background-color: white;
     border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-md);
     padding: 2.5rem;
     transition:
-      transform 0.3s,
-      box-shadow 0.3s;
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -333,20 +333,28 @@ const services = [
   }
 
   .service-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
   }
 
   .service-icon {
     font-size: 3.5rem;
     margin-bottom: 1.2rem;
-    background-color: var(--color-light);
+    background: linear-gradient(135deg, var(--color-light) 0%, #e9ecef 100%);
     width: 80px;
     height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .service-card:hover .service-icon {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: var(--shadow-primary-md);
   }
 
   .service-card h3 {
@@ -365,12 +373,20 @@ const services = [
   .service-details {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.5s ease;
-    margin-bottom: 1rem;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                margin-bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 0 !important;
   }
 
   .service-card.active .service-details {
-    max-height: 1500px; /* Altura suficiente para mostrar todo el contenido */
+    max-height: 2000px !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  /* Asegurar que el contenido interno no cause problemas */
+  .service-card:not(.active) .service-details > * {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   .service-details h4 {
@@ -454,7 +470,7 @@ const services = [
 
   .btn-toggle {
     background-color: var(--color-light);
-    border: none;
+    border: 2px solid transparent;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -464,11 +480,26 @@ const services = [
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    color: var(--color-primary);
   }
 
   .btn-toggle:hover {
-    background-color: #e0e0e0;
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-primary-sm);
+  }
+
+  .service-card.active .btn-toggle {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .service-card.active .btn-toggle:hover {
+    background-color: var(--color-primary-dark);
+    transform: scale(1.15);
   }
 
   .icon-plus,
@@ -491,11 +522,11 @@ const services = [
 
   .service-cta {
     background-color: var(--color-light);
-    padding: 3.5rem;
+    padding: var(--spacing-xxl);
     border-radius: 12px;
     text-align: center;
-    margin-top: 4rem;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+    margin-top: var(--spacing-xl);
+    box-shadow: var(--shadow-lg);
   }
 
   .service-cta h3 {
@@ -633,10 +664,22 @@ const services = [
     const toggleButtons = document.querySelectorAll(".btn-toggle");
 
     toggleButtons.forEach((button) => {
-      button.addEventListener("click", () => {
+      button.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         const serviceCard = button.closest(".service-card");
-        serviceCard.classList.toggle("active");
+        if (serviceCard) {
+          serviceCard.classList.toggle("active");
+        }
       });
+    });
+    
+    // Asegurar que todas las cards empiecen contraídas
+    const serviceCards = document.querySelectorAll(".service-card");
+    serviceCards.forEach((card) => {
+      if (card.classList.contains("active")) {
+        card.classList.remove("active");
+      }
     });
   });
 </script>
