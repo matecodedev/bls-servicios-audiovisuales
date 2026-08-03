@@ -83,6 +83,7 @@ const {
       {
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
+        "@id": "https://blsnet.com.ar/#business",
         "name": "BLS Servicios Audiovisuales",
         "image": "https://blsnet.com.ar/logo-icon.png",
         "url": "https://blsnet.com.ar",
@@ -110,7 +111,77 @@ const {
           "https://www.instagram.com/blsnet.com.ar"
         ],
         "priceRange": "$$",
-        "description": "BLS Servicios Audiovisuales ofrece soluciones técnicas profesionales para eventos: sonido, iluminación, video y escenarios. Experiencia en eventos corporativos e institucionales."
+        "description": "BLS Servicios Audiovisuales ofrece soluciones técnicas profesionales para eventos: sonido, iluminación, video y escenarios. Experiencia en eventos corporativos e institucionales.",
+        "areaServed": {
+          "@type": "AdministrativeArea",
+          "name": "Ciudad Autónoma de Buenos Aires y Provincia de Buenos Aires, Argentina"
+        },
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Servicios técnicos para eventos",
+          "itemListElement": [
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Conferencias y congresos",
+                "serviceType": "Producción técnica de conferencias y congresos",
+                "description": "Equipamiento específico para conferencias, traducción simultánea, streaming y grabación profesional.",
+                "provider": { "@id": "https://blsnet.com.ar/#business" }
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Sonido profesional",
+                "serviceType": "Alquiler y operación de sonido para eventos",
+                "description": "Sistemas de sonido profesional para eventos de todo tipo.",
+                "provider": { "@id": "https://blsnet.com.ar/#business" }
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Video y proyección",
+                "serviceType": "Video, pantallas LED y proyección para eventos",
+                "description": "Pantallas LED, proyectores, mapping y producción audiovisual completa para presentaciones, conciertos y eventos corporativos.",
+                "provider": { "@id": "https://blsnet.com.ar/#business" }
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Iluminación",
+                "serviceType": "Iluminación escénica, arquitectónica y decorativa",
+                "description": "Iluminación arquitectónica, decorativa y escénica. Desde ambientación hasta espectáculos de luces sincronizados con música.",
+                "provider": { "@id": "https://blsnet.com.ar/#business" }
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Escenarios y estructuras",
+                "serviceType": "Montaje de escenarios y estructuras temporales",
+                "description": "Montaje de escenarios y estructuras temporales con las máximas garantías de seguridad, con certificados de ignifugado.",
+                "provider": { "@id": "https://blsnet.com.ar/#business" }
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Efectos especiales",
+                "serviceType": "Efectos especiales para eventos",
+                "description": "Máquinas de humo, confeti, pirotecnia fría, CO2 y otros efectos escénicos.",
+                "provider": { "@id": "https://blsnet.com.ar/#business" }
+              }
+            }
+          ]
+        }
       }
     </script>
   </head>
